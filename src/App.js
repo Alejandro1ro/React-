@@ -4,15 +4,17 @@ import {TaskBanner} from './components/TaskBanner.js';
 import {TaskCreator} from './components/TaskCreator.js';
 import {VisibilityControl} from './components/VisibilityControl.js';
 
+const defaultValue = [
+    {name: 'Task One', done: false},
+    {name: 'Task Two', done: false},
+    {name: 'Task Three', done: false},
+    {name: 'Task Four', done: false},
+    {name: 'Task Five', done: false}
+];
+
 function App() {
     const [userName, setUserName] = useState('Alejandro');
-    const [taskItems, setTaskItems] = useState([
-        {name: 'Task One', done: false},
-        {name: 'Task Two', done: false},
-        {name: 'Task Three', done: false},
-        {name: 'Task Four', done: false},
-        {name: 'Task Five', done: false}
-    ]);
+    const [taskItems, setTaskItems] = useState(defaultValue);
     const [showCompleted, setShowCompleted] = useState(true);
 
     useEffect(() => {
@@ -32,13 +34,33 @@ function App() {
         }
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem('tasks', JSON.stringify(taskItems));
-    }, [taskItems]);
 
+    /**
+     * 
+     * @param {objet} task
+     * @param {string} action ["add", "delete", "update"]
+     * Tomar la task y la va a agrear o la va a actualizar si es necesario
+     *  
+     */
+    const allowedActions = ["add", "delete", "update"];
+    const updateTask = (task, action = "add") => {
+        // if (allowedActions.includes(action))            // boolean
+        if(allowedActions.indexOf(action) === -1) return; // number
+
+        let tasks = [...taskItems];
+        if (!taskItems.find((t) => t.name === task)) {
+            tasks = [...taskItems, {name: task, done: false}];
+        }
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        setTaskItems(tasks);
+    }
+
+    // TODO: Eliminar la funcion
     const createNewTask = (taskName) => {
         if (!taskItems.find((t) => t.name === taskName)) {
-            setTaskItems([...taskItems, {name: taskName, done: false}]);
+            const tasks = [...taskItems, {name: taskName, done: false}];
+            setTaskItems(tasks);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
         }
     };
 
